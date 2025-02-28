@@ -3,30 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Sistem Login dengan PIN Acak</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            width: 350px;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .visible {
+            display: block;
+        }
+        
+        #pinDisplay {
+            background-color: #e7f5fe;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: 1px solid #b8daff;
+            text-align: center;
+            display: none;
+        }
+        
+        #pinValue {
+            font-size: 24px;
+            font-weight: bold;
+            color: #004085;
+            margin: 10px 0;
+        }
+        
+        #loginForm, #generatePinForm, #pinForm {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username"><br>
-    <input type="password" id="pin" placeholder="Masukkan PIN (6 angka)"><br>
-    <button onclick="cekLogin()">Login</button>
-    <p id="hasil"></p>
+    <div class="container">
+        <div id="generatePinForm">
+            <h2>Generate PIN</h2>
+            <div class="form-group">
+                <label for="usernameGenerate">Username:</label>
+                <input type="text" id="usernameGenerate" placeholder="Masukkan username Anda">
+            </div>
+            <button type="button" id="generateBtn">Generate PIN</button>
+            
+            <div id="pinDisplay">
+                <p>INI PIN MU <span id="usernameDisplay"></span></p>
+                <p id="pinValue"></p>
+            </div>
+            
+            <button type="button" id="toLoginBtn" class="btn-secondary">Kembali ke Login</button>
+        </div>
+        
+        <div id="loginForm" class="hidden">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="usernameLogin">Username:</label>
+                <input type="text" id="usernameLogin" placeholder="Masukkan username Anda">
+            </div>
+            <div class="form-group">
+                <label for="pinLogin">PIN:</label>
+                <input type="password" id="pinLogin" placeholder="Masukkan PIN Anda">
+            </div>
+            <button type="button" id="loginBtn">Login</button>
+            <button type="button" id="toGenerateBtn" class="btn-secondary">Generate PIN Baru</button>
+            
+            <div class="message" id="loginMessage"></div>
+        </div>
+        
+        <div id="pinForm" class="hidden">
+            <h2>Selamat Datang!</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Anda berhasil login sebagai <span id="loggedInUsername" style="font-weight: bold;"></span></p>
+            <button type="button" id="logoutBtn">Logout</button>
+        </div>
+    </div>
 
     <script>
-        // PIN acak (misalnya '123456', ganti sesuai kebutuhan)
-        const pinBenar = String(Math.floor(100000 + Math.random() * 900000));
-
-        function cekLogin() {
-            let username = document.getElementById("username").value;
-            let pin = document.getElementById("pin").value;
-            let hasil = document.getElementById("hasil");
-
-            if (pin === pinBenar) {
-                hasil.innerText = "SELAMAT KAMU BERHASIL MASUK";
-            } else {
-                hasil.innerText = "PIN SALAH";
-            }
+        // Mendapatkan elemen-elemen
+        const generatePinForm = document.getElementById('generatePinForm');
+        const loginForm = document.getElementById('loginForm');
+        const pinForm = document.getElementById('pinForm');
+        
+        const usernameGenerate = document.getElementById('usernameGenerate');
+        const usernameLogin = document.getElementById('usernameLogin');
+        const pinLogin = document.getElementById('pinLogin');
+        
+        const generateBtn = document.getElementById('generateBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const toLoginBtn = document.getElementById('toLoginBtn');
+        const toGenerateBtn = document.getElementById('toGenerateBtn');
+        
+        const pinDisplay = document.getElementById('pinDisplay');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const pinValue = document.getElementById('pinValue');
+        const loggedInUsername = document.getElementById('loggedInUsername');
+        const loginMessage = document.getElementById('loginMessage');
+        
+        // Fungsi untuk membuat PIN acak 6 digit
+        function generateRandomPin() {
+            return Math.floor(100000 + Math.random() * 900000);
         }
+        
+        // Fungsi untuk menampilkan pesan
+        function showMessage(element, message, isSuccess) {
+            element.textContent = message;
+            element.className = 'message ' + (isSuccess ? 'success' : 'error');
+            element.style.display = 'block';
+            
+            // Sembunyikan pesan setelah 3 detik
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Fungsi untuk menyimpan PIN ke localStorage
+        function savePin(username, pin) {
+            const pins = JSON.parse(localStorage.getItem('userPins')) || {};
+            pins[username] = pin;
+            localStorage.setItem('userPins', JSON.stringify(pins));
+        }
+        
+        // Fungsi untuk mendapatkan PIN dari localStorage
+        function getPin(username) {
+            const pins = JSON.parse(localStorage.getItem('userPins')) || {};
+            return pins[username];
+        }
+        
+        // Event listener untuk tombol generate PIN
+        generateBtn.addEventListener('click', () => {
+            const username = usernameGenerate.value.trim();
+            
+            if (!username) {
+                showMessage(loginMessage, 'Username tidak boleh kosong', false);
+                return;
+            }
+            
+            const pin = generateRandomPin();
+            savePin(username, pin);
+            
+            usernameDisplay.textContent = username;
+            pinValue.textContent = pin;
+            pinDisplay.style.display = 'block';
+        });
+        
+        // Event listener untuk tombol login
+        loginBtn.addEventListener('click', () => {
+            const username = usernameLogin.value.trim();
+            const pin = pinLogin.value.trim();
+            
+            if (!username || !pin) {
+                showMessage(loginMessage, 'Username dan PIN tidak boleh kosong', false);
+                return;
+            }
+            
+            const savedPin = getPin(username);
+            
+            if (!savedPin) {
+                showMessage(loginMessage, 'Username tidak ditemukan', false);
+                return;
+            }
+            
+            if (pin === savedPin.toString()) {
+                loginForm.classList.add('hidden');
+                pinForm.classList.remove('hidden');
+                loggedInUsername.textContent = username;
+            } else {
+                showMessage(loginMessage, 'PIN tidak valid', false);
+            }
+        });
+        
+        // Event listener untuk tombol logout
+        logoutBtn.addEventListener('click', () => {
+            pinForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            usernameLogin.value = '';
+            pinLogin.value = '';
+        });
+        
+        // Event listener untuk tombol navigasi
+        toLoginBtn.addEventListener('click', () => {
+            generatePinForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+        
+        toGenerateBtn.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            generatePinForm.classList.remove('hidden');
+            pinDisplay.style.display = 'none';
+            usernameGenerate.value = '';
+        });
+        
+        // Tampilkan form login awal
+        window.addEventListener('DOMContentLoaded', () => {
+            generatePinForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            pinForm.classList.add('hidden');
+        });
     </script>
 </body>
 </html>
